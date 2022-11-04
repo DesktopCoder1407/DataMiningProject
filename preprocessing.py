@@ -6,37 +6,63 @@ from sklearn.decomposition import PCA
 
 def clean_data():
     data = pandas.read_csv('data/bank_churners.csv')
+
+    # Remove any unknown values
     data = data[data['Education_Level'] != 'Unknown']
     data = data[data['Marital_Status'] != 'Unknown']
     data = data[data['Income_Category'] != 'Unknown']
+
+    # Drop Naive Bayes Categories (Recommended by Dataset)
     data.drop(columns=['Naive_Bayes_Classifier_Attrition_Flag_Card_Category_Contacts_Count_12_mon_Dependent_count_Education_Level_Months_Inactive_12_mon_1',
                        'Naive_Bayes_Classifier_Attrition_Flag_Card_Category_Contacts_Count_12_mon_Dependent_count_Education_Level_Months_Inactive_12_mon_2'],
               inplace=True)
 
+    # Drop Irrelevant Data
+    data.drop(columns=['CLIENTNUM'])
+
     data.to_csv('data/cleaned_bank_churners.csv', index=False)
 
 
-def build_PCA(num_components):
+def build_PCA(num_components, return_PCA = False):
     data = pandas.read_csv('data/cleaned_bank_churners.csv')
-    original_data = pandas.read_csv('data/cleaned_bank_churners.csv')
-    data.drop(columns=['CLIENTNUM', 'Attrition_Flag'], inplace=True)
 
-    features = ['Customer_Age', 'Dependent_count', 'Total_Relationship_Count', 'Contacts_Count_12_mon',
-                'Months_on_book', 'Months_Inactive_12_mon', 'Credit_Limit', 'Avg_Open_To_Buy',
-                'Total_Revolving_Bal', 'Total_Trans_Amt', 'Total_Trans_Ct']
-    x = data.loc[:, features].values
-    data = StandardScaler().fit_transform(x)
+    x = data.loc[:, data.dtypes != object].values
+    x = StandardScaler().fit_transform(x)  # TODO: May have to scale numeric differently than categorical?
 
     pca = PCA(n_components=num_components)
-    principal_components = pca.fit_transform(data)
+    principal_components = pca.fit_transform(x)
     principal_data = pandas.DataFrame(data=principal_components,
                                       columns=['Principal Component ' + str(x + 1) for x in range(num_components)])
+    for i in range(len(pca.explained_variance_ratio_)):
+        print(f'Explained Variance for Component {i + 1}: {pca.explained_variance_ratio_[i]:.2%}')
+    print(f'Sum of Explained Variance: {sum(pca.explained_variance_ratio_):.2%}')
 
-    print(f'Explained Variance per Component: {pca.explained_variance_ratio_}')
-    print(f'Sum of Explained Variance: {sum(pca.explained_variance_ratio_)}')
-
-    final_data = pandas.concat([principal_data, original_data['Attrition_Flag']], axis=1)
+    final_data = pandas.concat([principal_data, data['Attrition_Flag']], axis=1)
+    if return_PCA:
+        return pca
     return final_data
+
+
+def graph_PCA_variance(num_components):
+    pca = build_PCA(num_components, return_PCA=True)
+
+    # Data
+    x = [x+1 for x in range(num_components)]
+    y = [x*100 for x in pca.explained_variance_ratio_]
+
+    # Line and Scatter Plot
+    plt.plot(x, y)
+    plt.scatter(x, y)
+
+    # Display the data label near the point & have X and Y labels
+    for i, label in enumerate(y):
+        plt.annotate(f'{round(label, 1)}%', (x[i], y[i]))
+    plt.xlabel('PCA Component')
+    plt.ylabel('Explained Variance in %')
+    plt.title(f'Sum of Explained Variance: {sum(pca.explained_variance_ratio_):.2%}')
+
+    plt.show()
+    plt.close()
 
 
 def display_PCA():
@@ -69,5 +95,12 @@ def display_PCA():
     plt.close()
 
 
-build_PCA(8)
-display_PCA()
+# build_PCA(8)
+# display_PCA()
+graph_PCA_variance(8)
+
+# TODO: Determine the types of Categorical data (Make separate sheet to show datatypes for each column). Determine how to switch the categorical data to numeric.
+# data = pandas.read_csv('data/cleaned_bank_churners.csv')
+# data = data.loc[:, data.dtypes == object]
+#
+# print(data.loc[0])
