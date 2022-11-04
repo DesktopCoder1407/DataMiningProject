@@ -44,19 +44,25 @@ def display_PCA():
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1, projection='3d')
+
+    # Title and Labels
     ax.set_xlabel('Principal Component 1', fontsize=12)
     ax.set_ylabel('Principal Component 2', fontsize=12)
     ax.set_zlabel('Principal Component 3', fontsize=12)
     ax.set_title('3 Component PCA', fontsize=20)
+
+    # Create two groups: one for each class
     targets = ['Existing Customer', 'Attrited Customer']
     colors = ['r', 'b']
     for target, color in zip(targets, colors):
         indicesToKeep = data['Attrition_Flag'] == target
         ax.scatter(data.loc[indicesToKeep, 'Principal Component 1'],
-                   data.loc[indicesToKeep, 'Principal Component 2'],
-                   data.loc[indicesToKeep, 'Principal Component 3'],
-                   c=color, s=50)
+               data.loc[indicesToKeep, 'Principal Component 2'],
+               data.loc[indicesToKeep, 'Principal Component 3'],
+               c=color, s=4)
     ax.legend(targets)
+
+    # Set the format as a grid and display/save
     ax.grid()
     plt.show()
     plt.savefig('visualization/PCA.png')
