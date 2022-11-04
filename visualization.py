@@ -1,6 +1,9 @@
 from hishiryo import Hishiryo
 import matplotlib.pyplot as plt
+import numpy
 import pandas
+import seaborn
+from sklearn.preprocessing import StandardScaler
 
 data = pandas.read_csv('data/cleaned_bank_churners.csv')
 
@@ -17,6 +20,7 @@ def plot_boxplots():
         plt.ylabel(item[1])
         #plt.show()
         plt.savefig('visualization/' + item[0] + '.png')
+        plt.close()
 
 
 def plot_hishiryo():
@@ -28,4 +32,20 @@ def plot_hishiryo():
                             'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1'], 'Polygon')
 
 
-plot_boxplots()
+def plot_heatmap():
+    data = pandas.read_csv('data/cleaned_bank_churners.csv')
+    features = ['Customer_Age', 'Dependent_count', 'Total_Relationship_Count', 'Contacts_Count_12_mon',
+                'Months_on_book', 'Months_Inactive_12_mon', 'Credit_Limit', 'Avg_Open_To_Buy',
+                'Total_Revolving_Bal', 'Total_Trans_Amt', 'Total_Trans_Ct']
+
+    data = pandas.DataFrame(StandardScaler().fit_transform(data[features]), columns=features)
+    covariance_matrix = numpy.cov(data.transpose(), bias=True)
+
+    fig = plt.figure(figsize=(14, 10))
+    seaborn.heatmap(covariance_matrix, annot=True, xticklabels=features, yticklabels=features)
+    # plt.show()
+    plt.savefig('visualization/heatmap.png')
+    plt.close()
+
+
+plot_heatmap()
