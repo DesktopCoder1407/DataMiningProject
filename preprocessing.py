@@ -18,7 +18,7 @@ def clean_data():
               inplace=True)
 
     # Drop Irrelevant Data
-    data.drop(columns=['CLIENTNUM'])
+    data.drop(columns=['CLIENTNUM'], inplace=True)
 
     data.to_csv('data/cleaned_bank_churners.csv', index=False)
 
@@ -94,13 +94,11 @@ def display_PCA():
     plt.savefig('visualization/PCA.png')
     plt.close()
 
-
+clean_data()
 # build_PCA(8)
 # display_PCA()
-graph_PCA_variance(8)
+#graph_PCA_variance(14)
 
-# TODO: Determine the types of Categorical data (Make separate sheet to show datatypes for each column). Determine how to switch the categorical data to numeric.
-# data = pandas.read_csv('data/cleaned_bank_churners.csv')
-# data = data.loc[:, data.dtypes == object]
-#
-# print(data.loc[0])
+
+# TODO: Determine how to switch the categorical data to numeric.
+# Z-Score standardization is good. Binary values can be z-scored fine. Ordinal values need to be computed using slide 59. For Nominal, possibly turn to binary then z-score.
