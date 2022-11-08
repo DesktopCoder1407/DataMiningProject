@@ -2,6 +2,7 @@ from hishiryo import Hishiryo
 import matplotlib.pyplot as plt
 import numpy
 import pandas
+from preprocessing import display_PCA
 import seaborn
 from sklearn.preprocessing import StandardScaler
 
@@ -49,3 +50,4 @@ def plot_heatmap():
 
 
 plot_heatmap()
+display_PCA()

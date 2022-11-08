@@ -1,16 +1,11 @@
 import matplotlib.pyplot as plt
 import pandas
-from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 
 def clean_data():
     data = pandas.read_csv('data/bank_churners.csv')
-
-    # Remove any unknown values
-    data = data[data['Education_Level'] != 'Unknown']
-    data = data[data['Marital_Status'] != 'Unknown']
-    data = data[data['Income_Category'] != 'Unknown']
 
     # Drop Naive Bayes Categories (Recommended by Dataset)
     data.drop(columns=['Naive_Bayes_Classifier_Attrition_Flag_Card_Category_Contacts_Count_12_mon_Dependent_count_Education_Level_Months_Inactive_12_mon_1',
@@ -20,15 +15,52 @@ def clean_data():
     # Drop Irrelevant Data
     data.drop(columns=['CLIENTNUM'], inplace=True)
 
+    # Rank Ordinal Data (Income Category)
+    for i, item in enumerate(data['Income_Category']):
+        if item == 'Less than $40K':
+            data.loc[i, 'Income_Category'] = 1
+        if item == '$40K - $60K':
+            data.loc[i, 'Income_Category'] = 2
+        if item == '$60K - $80K':
+            data.loc[i, 'Income_Category'] = 3
+        if item == '$80K - $120K':
+            data.loc[i, 'Income_Category'] = 4
+        if item == '$120K +':
+            data.loc[i, 'Income_Category'] = 5
+
+    # Rank Ordinal Data (Card Category)
+    for i, item in enumerate(data['Card_Category']):
+        if item == 'Blue':
+            data.loc[i, 'Card_Category'] = 1
+        if item == 'Silver':
+            data.loc[i, 'Card_Category'] = 2
+        if item == 'Gold':
+            data.loc[i, 'Card_Category'] = 3
+        if item == 'Platinum':
+            data.loc[i, 'Card_Category'] = 4
+
+    # Remove any unknown values
+    data = data[data['Education_Level'] != 'Unknown']
+    data = data[data['Marital_Status'] != 'Unknown']
+    data = data[data['Income_Category'] != 'Unknown']
+
+    # One-Hot-Encoding for Categorical Data
+    data = pandas.concat([data, pandas.get_dummies(data['Gender'], prefix='Gender')], axis=1)
+    data = pandas.concat([data, pandas.get_dummies(data['Education_Level'], prefix='Education')], axis=1)
+    data = pandas.concat([data, pandas.get_dummies(data['Marital_Status'], prefix='Marital_Status')], axis=1)
+    data.drop(columns=['Gender', 'Education_Level', 'Marital_Status'], inplace=True)
+
     data.to_csv('data/cleaned_bank_churners.csv', index=False)
 
 
 def build_PCA(num_components, return_PCA = False):
     data = pandas.read_csv('data/cleaned_bank_churners.csv')
 
-    x = data.loc[:, data.dtypes != object].values
-    x = StandardScaler().fit_transform(x)  # TODO: May have to scale numeric differently than categorical?
+    x = data.drop(columns=['Attrition_Flag'])
+    x = StandardScaler().fit_transform(x)
 
+    if num_components <= 0:
+        num_components = x.shape[1]
     pca = PCA(n_components=num_components)
     principal_components = pca.fit_transform(x)
     principal_data = pandas.DataFrame(data=principal_components,
@@ -43,11 +75,11 @@ def build_PCA(num_components, return_PCA = False):
     return final_data
 
 
-def graph_PCA_variance(num_components):
+def graph_PCA_variance(num_components = 0):
     pca = build_PCA(num_components, return_PCA=True)
 
     # Data
-    x = [x+1 for x in range(num_components)]
+    x = [x+1 for x in range(pca.n_components)]
     y = [x*100 for x in pca.explained_variance_ratio_]
 
     # Line and Scatter Plot
@@ -94,11 +126,6 @@ def display_PCA():
     plt.savefig('visualization/PCA.png')
     plt.close()
 
+
 clean_data()
-# build_PCA(8)
-# display_PCA()
-#graph_PCA_variance(14)
-
-
-# TODO: Determine how to switch the categorical data to numeric.
-# Z-Score standardization is good. Binary values can be z-scored fine. Ordinal values need to be computed using slide 59. For Nominal, possibly turn to binary then z-score.
+graph_PCA_variance(16)
