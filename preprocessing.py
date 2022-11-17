@@ -50,6 +50,9 @@ def clean_data():
     data = pandas.concat([data, pandas.get_dummies(data['Marital_Status'], prefix='Marital_Status')], axis=1)
     data.drop(columns=['Gender', 'Education_Level', 'Marital_Status'], inplace=True)
 
+    # Binarize Category Values: 0 for Attritted, 1 for Existing
+    data["Attrition_Flag"] = (data["Attrition_Flag"] == 'Existing Customer').astype(int)
+
     data.to_csv('data/cleaned_bank_churners.csv', index=False)
 
 
