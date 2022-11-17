@@ -126,6 +126,6 @@ def display_PCA():
     plt.savefig('visualization/PCA.png')
     plt.close()
 
-
-clean_data()
-graph_PCA_variance(16)
+if __name__ == '__main__':
+    clean_data()
+    graph_PCA_variance(16)
