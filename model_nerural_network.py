@@ -27,12 +27,10 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.10, random
 
 start_time = time.time()
 
-for i in range(5):
-
-    model.fit(x_train, y_train, 
-            epochs=250, validation_split = .1, 
-            callbacks=[tf.keras.callbacks.TensorBoard(log_dir='./logs/' + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '/'),
-                        tf.keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True)])
+model.fit(x_train, y_train, 
+          epochs=250, validation_split = .1, 
+          callbacks=[tf.keras.callbacks.TensorBoard(log_dir='./logs/' + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '/'),
+                     tf.keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True)])
 
 training_time = time.time() - start_time
 metrics = model.evaluate(x_test, y_test)
