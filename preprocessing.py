@@ -113,7 +113,7 @@ def display_PCA():
     ax.set_title('3 Component PCA', fontsize=20)
 
     # Create two groups: one for each class
-    targets = ['Existing Customer', 'Attrited Customer']
+    targets = [0, 1]
     colors = ['r', 'b']
     for target, color in zip(targets, colors):
         indicesToKeep = data['Attrition_Flag'] == target
@@ -121,11 +121,11 @@ def display_PCA():
                data.loc[indicesToKeep, 'Principal Component 2'],
                data.loc[indicesToKeep, 'Principal Component 3'],
                c=color, s=4)
-    ax.legend(targets)
+    ax.legend(targets, labels=['Attrited Customer', 'Existing Customers'])
 
     # Set the format as a grid and display/save
     ax.grid()
-    plt.show()
+    # plt.show()
     plt.savefig('visualization/PCA.png')
     plt.close()
 

@@ -48,7 +48,7 @@ def plot_heatmap():
     plt.savefig('visualization/heatmap.png')
     plt.close()
 
-plot_boxplots()
-plot_hishiryo()
-plot_heatmap()
+# plot_boxplots()
+# plot_hishiryo()
+# plot_heatmap()
 display_PCA()
