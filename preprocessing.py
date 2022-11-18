@@ -68,9 +68,9 @@ def build_PCA(num_components, return_PCA = False):
     principal_components = pca.fit_transform(x)
     principal_data = pandas.DataFrame(data=principal_components,
                                       columns=['Principal Component ' + str(x + 1) for x in range(num_components)])
-    for i in range(len(pca.explained_variance_ratio_)):
-        print(f'Explained Variance for Component {i + 1}: {pca.explained_variance_ratio_[i]:.2%}')
-    print(f'Sum of Explained Variance: {sum(pca.explained_variance_ratio_):.2%}')
+    # for i in range(len(pca.explained_variance_ratio_)):
+    #     print(f'Explained Variance for Component {i + 1}: {pca.explained_variance_ratio_[i]:.2%}')
+    # print(f'Sum of Explained Variance: {sum(pca.explained_variance_ratio_):.2%}')
 
     final_data = pandas.concat([principal_data, data['Attrition_Flag']], axis=1)
     if return_PCA:
