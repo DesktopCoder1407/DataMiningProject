@@ -21,6 +21,6 @@ knn = KNeighborsClassifier(n_neighbors=7)
 
 knn.fit(X_train, y_train)
 
-# Predict on dataset which model has not seen before
-print(knn.predict(X_test))
+
+print(knn.score(X_test, y_test))
 
