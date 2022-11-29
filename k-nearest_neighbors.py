@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 
 # Loading data
@@ -26,11 +27,21 @@ test_accuracy = np.empty(len(neighbors))
 # Loop over K values
 for i, k in enumerate(neighbors):
     knn = KNeighborsClassifier(n_neighbors=k)
+    start_time = time.time()
     knn.fit(X_train, y_train)
+    training_time = time.time() - start_time
 
     # Compute training and test data accuracy
     train_accuracy[i] = knn.score(X_train, y_train)
     test_accuracy[i] = knn.score(X_test, y_test)
+
+    # Output accuracy and training time for each K value
+    print(f'''For K value of {k}:
+    Accuracy: {test_accuracy[i]:.4f}
+    Training Time: {training_time:.2f} seconds''')
+
+# Output average accuracy for all K values
+print(f'Mean Testing Accuracy is {sum(test_accuracy)/len(test_accuracy):.4f}')
 
 # Generate plot
 plt.plot(neighbors, test_accuracy, label = 'Testing dataset Accuracy')
